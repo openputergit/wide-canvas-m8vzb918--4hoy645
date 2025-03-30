@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Translation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .translated-text {
+            min-height: 150px;
+        }
+        .language-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Community Translator</h1>
+            <div class="flex gap-4">
+                <button id="loginBtn" class="px-4 py-2 bg-blue-700 rounded hover:bg-blue-800">Login</button>
+                <button id="signupBtn" class="px-4 py-2 bg-green-600 rounded hover:bg-green-700">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <select id="sourceLanguage" class="language-select border rounded p-2 w-40">
+                            <option value="auto">Detect Language</option>
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="hi">Hindi</option>
+                        </select>
+                        <button id="clearSource" class="text-gray-500 hover:text-gray-700">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </div>
+                    <textarea id="sourceText" class="w-full p-4 border rounded translated-text" placeholder="Enter text to translate"></textarea>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <select id="targetLanguage" class="language-select border rounded p-2 w-40">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="hi">Hindi</option>
+                        </select>
+                        <button id="copyTranslation" class="text-gray-500 hover:text-gray-700">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                    <div id="targetText" class="w-full p-4 border rounded translated-text bg-gray-50"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-4">
+                <button id="translateBtn" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Translate
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">Community Contributions</h2>
+            <div id="contributions" class="space-y-4">
+                <!-- Contributions will be dynamically added here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <h2 class="text-xl font-bold mb-4">Login</h2>
+            <input type="email" placeholder="Email" class="w-full p-2 border rounded mb-4">
+            <input type="password" placeholder="Password" class="w-full p-2 border rounded mb-4">
+            <div class="flex justify-end gap-2">
+                <button class="closeModal px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeModals = document.querySelectorAll('.closeModal');
+        const translateBtn = document.getElementById('translateBtn');
+        const sourceText = document.getElementById('sourceText');
+        const targetText = document.getElementById('targetText');
+        const clearSource = document.getElementById('clearSource');
+        const copyTranslation = document.getElementById('copyTranslation');
+
+        // Modal functionality
+        loginBtn.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+        });
+
+        closeModals.forEach(btn => {
+            btn.addEventListener('click', () => {
+                loginModal.classList.add('hidden');
+            });
+        });
+
+        // Clear source text
+        clearSource.addEventListener('click', () => {
+            sourceText.value = '';
+            targetText.textContent = '';
+        });
+
+        // Copy translation
+        copyTranslation.addEventListener('click', () => {
+            const text = targetText.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Translation copied to clipboard!');
+            });
+        });
+
+        // Mock translation function (in real implementation, this would call your backend)
+        translateBtn.addEventListener('click', async () => {
+            const text = sourceText.value;
+            const sourceLang = document.getElementById('sourceLanguage').value;
+            const targetLang = document.getElementById('targetLanguage').value;
+
+            if (!text) {
+                alert('Please enter text to translate');
+                return;
+            }
+
+            // Simulate API call
+            targetText.textContent = 'Translation in progress...';
+            
+            try {
+                // In a real implementation, this would be your API endpoint
+                // const response = await fetch('/api/translate', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ text, sourceLang, targetLang })
+                // });
+                // const data = await response.json();
+                
+                // Simulated response
+                setTimeout(() => {
+                    targetText.textContent = `${text} (translated to ${targetLang})`;
+                }, 1000);
+            } catch (error) {
+                targetText.textContent = 'Translation failed. Please try again.';
+            }
+        });
+
+        // Add some mock contributions (in real implementation, these would come from your MongoDB)
+        const mockContributions = [
+            { user: 'John D.', fromLang: 'English', toLang: 'Spanish', count: 156 },
+            { user: 'Maria G.', fromLang: 'Spanish', toLang: 'English', count: 234 },
+        ];
+
+        const contributionsContainer = document.getElementById('contributions');
+        mockContributions.forEach(contribution => {
+            const div = document.createElement('div');
+            div.className = 'flex justify-between items-center p-4 bg-gray-50 rounded';
+            div.innerHTML = `
+                <div>
+                    <p class="font-semibold">${contribution.user}</p>
+                    <p class="text-sm text-gray-600">${contribution.fromLang} → ${contribution.toLang}</p>
+                </div>
+                <div class="text-blue-600 font-bold">${contribution.count} translations</div>
+            `;
+            contributionsContainer.appendChild(div);
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
